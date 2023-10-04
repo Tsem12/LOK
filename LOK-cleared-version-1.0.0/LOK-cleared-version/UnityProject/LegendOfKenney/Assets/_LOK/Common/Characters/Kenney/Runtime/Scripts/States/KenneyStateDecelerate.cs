@@ -18,7 +18,6 @@ namespace LOK.Common.Characters.Kenney
         private IMove2DOrientWriter _orientWriter;
         private IMove2DSpeedWriter _speedWriter;
 
-        private Vector2 _orient;
         protected override void OnStateInit()
         {
             _lockedReader = StateMachine.GetComponent<IMove2DLockedReader>();
@@ -37,7 +36,6 @@ namespace LOK.Common.Characters.Kenney
 
         protected override void OnStateEnter(AKenneyState previousState)
         {
-            _orient = _orientWriter.OrientDir;
             Debug.Log("Enter dece");
             float speed = _speedWriter.MoveSpeed / _speedMaxReader.MoveSpeedMax;
             _timer = MovementsData.StopDecelerationDuration * (1 - speed);
@@ -46,10 +44,10 @@ namespace LOK.Common.Characters.Kenney
 
         protected override void OnStateUpdate()
         {
-            _orientWriter.OrientDir = _orient;
             if (_lockedReader.AreMovementsLocked)
             {
                 StateMachine.ChangeState(StateMachine.StateIdle);
+                return;
             }
 
             if (_movReader.MoveDir != Vector2.zero)
@@ -68,6 +66,7 @@ namespace LOK.Common.Characters.Kenney
                     {
                         StateMachine.ChangeState(MovementsData.StartAccelerationDuration > 0f ? StateMachine.StateAccelerate : StateMachine.StateWalk);
                     }
+                    return;
                 }
             }
 
@@ -76,6 +75,7 @@ namespace LOK.Common.Characters.Kenney
             if (_timer > MovementsData.StopDecelerationDuration)
             {
                 StateMachine.ChangeState(StateMachine.StateIdle);
+                return;
             }
 
             float percentage = _timer / MovementsData.StopDecelerationDuration;

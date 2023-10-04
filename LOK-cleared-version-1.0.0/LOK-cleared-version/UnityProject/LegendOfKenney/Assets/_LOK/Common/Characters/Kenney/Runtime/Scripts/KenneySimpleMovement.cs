@@ -46,7 +46,7 @@ namespace LOK.Common.Characters.Kenney
             if (_iMove2DDirReader.MoveDir != Vector2.zero)
             {
                 
-                //_iMove2DOrientWriter.OrientDir = _iMove2DDirReader.MoveDir;
+                _iMove2DOrientWriter.OrientDir = _iMove2DDirReader.MoveDir;
                 _iMove2DSpeedWriter.MoveSpeed = _iMove2DSpeedMaxReader.MoveSpeedMax;
             }
             else

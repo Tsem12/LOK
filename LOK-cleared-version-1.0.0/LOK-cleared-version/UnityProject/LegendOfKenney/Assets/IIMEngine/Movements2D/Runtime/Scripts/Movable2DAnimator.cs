@@ -22,6 +22,7 @@ namespace IIMEngine.Movements2D
         #endregion
 
         private IMove2DSpeedReader _speedReader;
+        private IMove2DSpeedMaxReader _speedMaxReader;
         private IMove2DLockedReader _lockReader;
         private Animator _animator;
         private bool _isMoving;
@@ -29,6 +30,7 @@ namespace IIMEngine.Movements2D
         {
             _animator = GetComponent<Animator>();
             _speedReader = _movableGameObject.GetComponent<IMove2DSpeedReader>();
+            _speedMaxReader = _movableGameObject.GetComponent<IMove2DSpeedMaxReader>();
             _lockReader = _movableGameObject.GetComponent<IMove2DLockedReader>();
             
             //Convert _isMovingParameter to Hash 
@@ -45,7 +47,7 @@ namespace IIMEngine.Movements2D
         {
             _isMoving = _speedReader.MoveSpeed != 0 ? true : false;
             _animator.SetBool(_isMovingParameterHash, _isMoving);
-            _animator.speed = Mathf.Clamp(_speedReader.MoveSpeed, 1, _animatorSpeedMax);
+            _animator.speed = Mathf.Clamp(_speedReader.MoveSpeed / _speedMaxReader.MoveSpeedMax, _animatorSpeedMin, _animatorSpeedMax);
 
             //Check if object is moving (store it inside a bool)
             //Bonus : Get Object movement speed and speed max to interpolate animator speed

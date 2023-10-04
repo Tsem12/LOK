@@ -68,7 +68,7 @@ namespace LOK.Common.Characters.Kenney
                 result += new Vector2(-1, 0);
             }
 
-            _moveDirWriter.MoveDir = result;
+            _moveDirWriter.MoveDir = result.normalized;
         }
 
         private bool _GetInputDownAction()

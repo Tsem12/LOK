@@ -39,20 +39,25 @@ namespace LOK.Common.Characters.Kenney
 
         protected override void OnStateUpdate()
         {
+            
+            
             if (_lockedReader.AreMovementsLocked)
             {
                 StateMachine.ChangeState(StateMachine.StateIdle);
+                return;
             }
             if (_movReader.MoveDir == Vector2.zero)
             {
                 StateMachine.ChangeState(MovementsData.StopDecelerationDuration > 0 ? StateMachine.StateDecelerate : StateMachine.StateIdle);
+                return;
             }
 
             if (MovementsData.TurnBackDecelerationDuration > 0 && Vector2.Angle(_movReader.MoveDir, _orientWriter.OrientDir) > MovementsData.TurnBackAngleThreshold)
             {
                 StateMachine.ChangeState(StateMachine.StateTurnBackDecelerate);
+                return;
             }
-
+            
             _orientWriter.OrientDir = _movReader.MoveDir;
             //Go to State Idle if Movements are locked
 

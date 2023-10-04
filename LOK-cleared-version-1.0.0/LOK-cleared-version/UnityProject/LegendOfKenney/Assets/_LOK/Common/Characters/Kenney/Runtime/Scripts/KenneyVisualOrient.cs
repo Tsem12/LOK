@@ -17,11 +17,12 @@ namespace LOK.Common.Characters.Kenney
         [SerializeField] private Transform _orientRoot;
 
         [Header("Flip Effect")]
-        [SerializeField] private float _flipDuration = 0.5f;
+        [SerializeField] private float _flipDuration ;
 
         private IMove2DOrientReader _orientReader;
         private KenneyStateMachine _stateMachine;
 
+        private Coroutine _flipRoutine;
         private float _startScaleX = 0f;
 
         private bool _isFlipping = false;
@@ -52,17 +53,43 @@ namespace LOK.Common.Characters.Kenney
         private void Update()
         {
 
-            if (_orientReader.OrientDir.x > 0)
+            if (_orientReader.OrientDir.x > 0 && _orientRoot.localScale.x < 0)
             {
-                _orientRoot.localScale = new Vector3(_startScaleX, _orientRoot.localScale.y, _orientRoot.localScale.z);
+                if (_flipRoutine != null)
+                {
+                    StopCoroutine(_flipRoutine);
+                    _flipRoutine = null;
+                }
+                _flipRoutine = StartCoroutine(FlipRoutine(_startScaleX));
+                //_orientRoot.localScale = new Vector3(_startScaleX, _orientRoot.localScale.y, _orientRoot.localScale.z);
             }
-            else
+            else if(_orientReader.OrientDir.x < 0 && _orientRoot.localScale.x > 0)
             {
-                _orientRoot.localScale = new Vector3(-_startScaleX, _orientRoot.localScale.y, _orientRoot.localScale.z);
+                if (_flipRoutine != null)
+                {
+                    StopCoroutine(_flipRoutine);
+                    _flipRoutine = null;
+                }
+                _flipRoutine = StartCoroutine(FlipRoutine(-_startScaleX));
+                //_orientRoot.localScale = new Vector3(-_startScaleX, _orientRoot.localScale.y, _orientRoot.localScale.z);
             }
             //Detect if kenney need to flip ScaleX (using orientReader and current scale.x)
             //Bonus : you can create a flip animation using _flipDuration
         }
-        
+
+        IEnumerator FlipRoutine(float to)
+        {
+            float timer = 0;
+            float baseOrient = _orientRoot.localScale.x;
+            while (timer < _flipDuration)
+            {
+                timer += Time.deltaTime;
+                float value = Mathf.Lerp(baseOrient, to, timer / _flipDuration);
+                _orientRoot.localScale = new Vector3(value, _orientRoot.localScale.y, _orientRoot.localScale.z);
+                yield return null;
+            }
+            _flipRoutine = null;
+        }
     }
+    
 }

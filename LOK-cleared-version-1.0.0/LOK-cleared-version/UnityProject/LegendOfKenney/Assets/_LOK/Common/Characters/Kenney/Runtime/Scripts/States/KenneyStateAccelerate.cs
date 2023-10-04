@@ -48,11 +48,13 @@ namespace LOK.Common.Characters.Kenney
             if (_lockedReader.AreMovementsLocked)
             {
                 StateMachine.ChangeState(StateMachine.StateIdle);
+                return;
             }
 
             if (_movReader.MoveDir == Vector2.zero)
             {
                 StateMachine.ChangeState(MovementsData.StopDecelerationDuration > 0 ? StateMachine.StateDecelerate : StateMachine.StateIdle);
+                return;
             }
 
             if (Vector2.Angle(_movReader.MoveDir, _orientWriter.OrientDir) > MovementsData.TurnBackAngleThreshold)
@@ -62,6 +64,8 @@ namespace LOK.Common.Characters.Kenney
                 
                 if(MovementsData.TurnBackAccelerationDuration > 0)
                     StateMachine.ChangeState(StateMachine.StateTurnBackAccelerate);
+                
+                return;
             }
 
             _timer += Time.deltaTime;
@@ -69,6 +73,7 @@ namespace LOK.Common.Characters.Kenney
             if (_timer > MovementsData.StartAccelerationDuration)
             {
                 StateMachine.ChangeState(StateMachine.StateWalk);
+                return;
             }
 
             float percentage = _timer / MovementsData.StartAccelerationDuration;
