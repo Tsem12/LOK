@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using IIMEngine.Movements2D;
 using UnityEngine;
 using UnityEngine.UIElements;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using IIMEngine.Movements2D;
 using UnityEngine;
 

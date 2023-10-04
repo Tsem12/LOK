@@ -1,4 +1,4 @@
-﻿using IIMEngine.Movements2D;
+using IIMEngine.Movements2D;
 using UnityEngine;
 
 namespace LOK.Common.Characters.Kenney
