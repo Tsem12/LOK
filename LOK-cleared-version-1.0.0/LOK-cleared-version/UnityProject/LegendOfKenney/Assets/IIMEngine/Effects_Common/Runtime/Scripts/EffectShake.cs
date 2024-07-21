@@ -22,6 +22,10 @@ namespace IIMEngine.Effects.Common
 
         protected override void OnEffectStart()
         {
+            _timer = 0;
+            _objectToShake.localPosition -= _positionDelta;
+            _positionDelta = Vector3.zero;
+
             //Reset Timer
             //Remove position delta from objectToShake localPosition
             //Reset position delta X/Y
@@ -29,6 +33,11 @@ namespace IIMEngine.Effects.Common
 
         protected override void OnEffectUpdate()
         {
+            _objectToShake.localPosition -= _positionDelta;
+            _timer += Time.deltaTime;
+            float percentage = Mathf.PingPong(_timer / _shakePeriod, 1);
+            _positionDelta = new Vector2(_shakePowerX * percentage, _shakePowerY * percentage);
+            _objectToShake.localPosition += _positionDelta;
             //Remove position delta from objectToShake localPosition
             //Increment timer with delta time
             //Calculating percentage between timer and shakePeriod (using Mathf.PingPong)
@@ -38,6 +47,10 @@ namespace IIMEngine.Effects.Common
 
         protected override void OnEffectEnd()
         {
+            _timer = 0;
+            _objectToShake.localPosition -= _positionDelta;
+            _positionDelta = Vector3.zero;
+
             //Reset Timer
             //Remove position delta from objectToShake localPosition
             //Reset position delta X/Y            

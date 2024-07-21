@@ -22,6 +22,7 @@ namespace IIMEngine.Camera.Feel
         #endregion
         
         //TODO: Override FeedbackDuration Property (using _shakeDuration)
+        public override float FeedbackDuration => _shakeDuration;
 
         protected override void CustomPlayFeedback(Vector3 position, float feedbacksIntensity = 1)
         {
@@ -32,7 +33,15 @@ namespace IIMEngine.Camera.Feel
         {
             //Add _cameraEffect into CameraEffects
             //Implements shake effects using _shakeDuration / _shakePeriod / _shakePower
-            yield break;
+            CameraGlobals.Effects.AddEffect(_cameraEffect);
+            float timer = 0;
+            while (timer < _shakeDuration)
+            {
+                timer += Time.deltaTime;
+                float percentage = Mathf.PingPong(timer / _shakePeriod, 1);
+                _cameraEffect.PositionDelta = new Vector3(_shakePower * percentage,_shakePower * percentage,0);
+                yield return null;
+            }
         }
     }
 }

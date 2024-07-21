@@ -19,11 +19,13 @@ namespace IIMEngine.Camera
         public void AddEffect(CameraEffect effect)
         {
             //TODO: Add effect to active effects
+            _activeEffects.Add(effect);
         }
 
         public void RemoveEffect(CameraEffect effect)
         {
             //TODO: Remove effect to active effects
+            _activeEffects.Remove(effect);
         }
         
         private void Awake()
@@ -33,6 +35,14 @@ namespace IIMEngine.Camera
 
         public void ManualUpdate(UnityEngine.Camera camera, Transform cameraTransform)
         {
+            PositionDelta = Vector3.zero;
+            SizeDelta = 0;
+            foreach (CameraEffect cam in _activeEffects)
+            {
+                PositionDelta += cam.PositionDelta;
+                SizeDelta += cam.SizeDelta;
+            }
+            
             //Reset Position Delta to Zero
             //Reset Size Delta to Zero
             //Sum all effects together into PositionDelta and SizeDelta

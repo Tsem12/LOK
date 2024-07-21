@@ -71,6 +71,18 @@ namespace IIMEngine.Camera
                 //Optional : Clamp Destination with Camera Bounds
                 //Lerp position with destination using CameraProfile.FollowLerpSpeed
             // --------------------------------------------------------
+
+            if (_currentProfile.FollowTargetGroups.Length > 0 && !IsTransitionActive)
+            {
+                if (_currentProfile.UsePOIs)
+                {
+                    //_currentProfile.Cen
+                }
+                else
+                {
+                    //_currentProfile.FollowTargetGroups
+                }
+            }
             
             cameraTransform.position = new Vector3(_position.x, _position.y, cameraTransform.position.z);
             cameraTransform.rotation = _rotation;
@@ -115,7 +127,27 @@ namespace IIMEngine.Camera
 
         private IEnumerator _CoroutineChangeProfile(CameraProfile profile, CameraProfileTransition transition = null)
         {
+            
+            
             IsTransitionActive = true;
+            float timer = 0f;
+            Vector3 startPos = _position;
+            Quaternion startRot = _rotation;
+            float startSize = _size;
+            
+            if (transition != null)
+            {
+                while (timer < transition.Duration)
+                {
+                    timer += Time.deltaTime;
+                    float percent = transition.Curve.Evaluate(timer / transition.Duration);
+                    _position = Vector3.Lerp(startPos, profile.Position, percent);
+                    _rotation = Quaternion.Lerp(startRot, profile.Rotation, percent);
+                    _size = Mathf.Lerp(startSize, profile.OrthographicSize, percent);
+                    yield return null;
+                }
+            }
+            
             //TODO: Implements Transition 
             //Lerp between current position and profile position
             //Lerp between current rotation and profile rotation

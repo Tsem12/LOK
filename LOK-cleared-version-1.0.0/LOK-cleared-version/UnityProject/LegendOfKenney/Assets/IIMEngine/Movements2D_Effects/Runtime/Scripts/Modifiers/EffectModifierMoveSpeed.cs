@@ -26,7 +26,7 @@ namespace IIMEngine.Movements2D.Effects.Modifiers
         public override float GetValue()
         {
             //TODO: Calculate and return Percentage according to MoveSpeed and MoveSpeedMax
-            return 0f;
+            return _moveSpeedReader.MoveSpeed / _moveSpeedMaxReader.MoveSpeedMax;
         }
     }
 }

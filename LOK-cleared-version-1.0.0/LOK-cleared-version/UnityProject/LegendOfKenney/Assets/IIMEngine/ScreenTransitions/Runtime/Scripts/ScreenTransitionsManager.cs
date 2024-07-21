@@ -33,28 +33,47 @@ namespace IIMEngine.ScreenTransitions
             _InitAllTransitions();
         }
 
+        public ScreenTransition GetScreenTransition(string transitionID)
+        {
+            foreach (ScreenTransition trans in _allTransitions)
+            {
+                if (transitionID == trans.TransitionID)
+                {
+                    return trans;
+                }
+            }
+            return null;
+        }
         public IEnumerator PlayAndWaitTransition(string transitionID)
         {
             //Call PlayTransition and wait until transition is finished
-            yield break;
+            PlayTransition(transitionID);
+            ScreenTransition t = GetScreenTransition(transitionID);
+            yield return new WaitUntil(() => !t.IsPlaying);
         }
 
         public ScreenTransition PlayTransition(string transitionID)
         {
+            ScreenTransition t = GetScreenTransition(transitionID);
+            t?.Play();
+            return t;
             //Find Transition using transitionID and return it
             //Play Transition if transition found
             //Return Transition
-            return null;
         }
 
         private ScreenTransition[] _FindAllTransitions()
         {
             //Find All ScreenTransitions
-            return Array.Empty<ScreenTransition>();
+            return FindObjectsOfType<ScreenTransition>();
         }
 
         private void _InitAllTransitions()
         {
+            foreach (ScreenTransition st in _allTransitions)
+            {
+                st.Init();
+            }
             //Call ScreenTransition.Init() method for each found transitions inside _allTransitions
         }
     }

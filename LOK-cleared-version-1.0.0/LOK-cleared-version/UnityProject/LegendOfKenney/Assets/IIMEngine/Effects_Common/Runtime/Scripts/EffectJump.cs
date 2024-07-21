@@ -35,6 +35,10 @@ namespace IIMEngine.Effects.Common
 
         protected override void OnEffectReset()
         {
+            _timer = 0f;
+            _objectToMove.localPosition -= _positionDelta;
+            _positionDelta = Vector3.zero;
+
             //Reset Timer
             //Remove position delta from objectToMove localPosition
             //Reset position delta Y
@@ -42,6 +46,17 @@ namespace IIMEngine.Effects.Common
 
         protected override IEnumerator OnEffectEndCoroutine()
         {
+            while (_timer < _jumpPeriod)
+            {
+                _objectToMove.localPosition -= _positionDelta;
+                _timer += Time.deltaTime;
+                float percentage = _timer / _jumpPeriod;
+                percentage = _jumpCurve.Evaluate(percentage);
+                _positionDelta = new Vector3(0, _jumpHeight * percentage, 0);
+                _objectToMove.localPosition += _positionDelta;
+                yield return null;
+            }
+            
             //TODO: Do not interrupt current jump
             //Wait for jump period (while loop)
                 //Remove position delta from objectToMove localPosition
@@ -56,6 +71,9 @@ namespace IIMEngine.Effects.Common
         
         protected override void OnEffectEnd()
         {
+            _timer = 0f;
+            _objectToMove.localPosition -= _positionDelta;
+            _positionDelta = Vector3.zero;
             //Reset Timer
             //Remove position delta from objectToMove localPosition
             //Reset position delta Y
@@ -63,6 +81,18 @@ namespace IIMEngine.Effects.Common
 
         protected override void OnEffectUpdate()
         {
+            _objectToMove.localPosition -= _positionDelta;
+            _timer += Time.deltaTime;
+            if (_isLooping)
+            {
+                if(_timer > _jumpPeriod) {_timer = 0;}
+            }
+
+            float percentage = _timer / _jumpPeriod;
+            percentage = _jumpCurve.Evaluate(percentage);
+            _positionDelta = new Vector3(0, percentage * _jumpHeight, 0);
+            _objectToMove.localPosition += _positionDelta;
+
             //Remove position delta from objectToMove localPosition
             //Increment timer with delta time (bonus : Applying factor to deltaTime using timeModifier)
             //If effect is looping, timer must loop between [0, jumpPeriod]

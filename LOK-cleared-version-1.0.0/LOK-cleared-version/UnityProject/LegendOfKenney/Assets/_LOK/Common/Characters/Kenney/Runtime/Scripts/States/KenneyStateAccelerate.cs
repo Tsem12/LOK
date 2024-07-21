@@ -38,7 +38,6 @@ namespace LOK.Common.Characters.Kenney
             _orientWriter.OrientDir = _movReader.MoveDir;
             float speed = _speedWriter.MoveSpeed / _speedMaxReader.MoveSpeedMax;
             _timer = MovementsData.StartAccelerationDuration * speed;
-            Debug.Log("Enter Acceleration");
             //Force OrientDir to MoveDir
             //Calculate _timer according to MoveSpeed / MoveSpeedMax / MovementsData.StartAccelerationDuration
         }

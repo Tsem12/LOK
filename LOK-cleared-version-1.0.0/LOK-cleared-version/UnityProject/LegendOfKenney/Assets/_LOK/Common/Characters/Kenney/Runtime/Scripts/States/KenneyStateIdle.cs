@@ -19,7 +19,6 @@ namespace LOK.Common.Characters.Kenney
 
         protected override void OnStateEnter(AKenneyState previousState)
         {
-            Debug.Log("Enter idle");
             _speedWritter.MoveSpeed = 0;
             //Force MoveSpeed to 0
         }

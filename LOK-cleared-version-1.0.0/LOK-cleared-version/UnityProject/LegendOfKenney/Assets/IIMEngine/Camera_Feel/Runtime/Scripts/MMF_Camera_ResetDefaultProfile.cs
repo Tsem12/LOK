@@ -9,13 +9,24 @@ namespace IIMEngine.Camera.Feel
     {
         [MMFInspectorGroup("Transition", true)]
         [SerializeField] private CameraProfileTransition _transition;
-        
+        public override float FeedbackDuration
+        {
+            get
+            {
+                if (_transition != null)
+                {
+                    return _transition.Duration;
+                }
+                return 0;
+            }
+
+        }
         //TODO: Override FeedbackDuration Property (using _transition)
         //Don't forget to check if transition is null (can be null when adding effect at the first time in the inspector)
 
         protected override void CustomPlayFeedback(Vector3 position, float feedbacksIntensity = 1)
         {
-            //TODO: Reset To Default Profile (with transition)
+            CameraGlobals.Profiles.ResetToDefaultProfile(_transition);
         }
     }
 }

@@ -40,7 +40,6 @@ namespace LOK.Common.Characters.Kenney
 
         protected override void OnStateEnter(AKenneyState previousState)
         {
-            Debug.Log(("TBACKDecelerate"));
             _turnBackWriter.IsTurningBack = true;
             
             float speed = _speedWriter.MoveSpeed / _speedMaxReader.MoveSpeedMax;

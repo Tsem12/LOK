@@ -38,6 +38,9 @@ namespace IIMEngine.Effects.Common
 
         protected override void OnEffectReset()
         {
+            _timer = 0f;
+            _objectToScale.localScale -= _scaleDelta;
+            _scaleDelta = Vector3.zero;
             //Reset Timer
             //Remove scale delta from objectToScale localScale
             //Reset scale delta X/Y
@@ -45,6 +48,18 @@ namespace IIMEngine.Effects.Common
 
         protected override IEnumerator OnEffectEndCoroutine()
         {
+            while (_timer < _bouncePeriod)
+            {
+                _objectToScale.localScale -= _scaleDelta;
+                _timer += Time.deltaTime;
+                float percentage = _timer / _bouncePeriod;
+                float percentageX = _bounceCurveX.Evaluate(percentage);
+                float percentageY = _bounceCurveY.Evaluate(percentage);
+                _scaleDelta = new Vector3(_bounceFactorX * percentageX,_bounceFactorY * percentageY , 0);
+                _objectToScale.localScale += _scaleDelta;
+                yield return null;
+            }
+            
             //TODO: Do not interrupt bouncing effect
             //Wait for bounce period
                 //Remove scale delta from objectToScale localScale
@@ -60,6 +75,9 @@ namespace IIMEngine.Effects.Common
 
         protected override void OnEffectEnd()
         {
+            _timer = 0f;
+            _objectToScale.localScale -= _scaleDelta;
+            _scaleDelta = Vector3.zero;
             //Reset Timer
             //Remove scale delta from objectToScale localScale
             //Reset scale delta X/Y
@@ -67,6 +85,18 @@ namespace IIMEngine.Effects.Common
         
         protected override void OnEffectUpdate()
         {
+            _objectToScale.localScale -= _scaleDelta;
+            _timer += Time.deltaTime;
+            if (_isLooping)
+            {
+                if(_timer > _bouncePeriod) {_timer = 0;}
+            }
+
+            float percentage = _timer / _bouncePeriod;
+            float percentageX = _bounceCurveX.Evaluate(percentage);
+            float percentageY = _bounceCurveY.Evaluate(percentage);
+            _scaleDelta = new Vector3(percentageX * _bounceFactorX, percentageY * _bounceFactorY, 0);
+            _objectToScale.localScale += _scaleDelta;
             //Remove scale delta from objectToScale localScale
             //Increment timer with delta time (bonus : Applying factor to deltaTime using timeModifier)
             //If effect is looping, timer must loop between [0, bouncePeriod]

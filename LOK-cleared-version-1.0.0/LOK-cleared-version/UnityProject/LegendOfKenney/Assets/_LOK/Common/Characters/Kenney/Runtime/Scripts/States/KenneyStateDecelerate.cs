@@ -36,7 +36,6 @@ namespace LOK.Common.Characters.Kenney
 
         protected override void OnStateEnter(AKenneyState previousState)
         {
-            Debug.Log("Enter dece");
             float speed = _speedWriter.MoveSpeed / _speedMaxReader.MoveSpeedMax;
             _timer = MovementsData.StopDecelerationDuration * (1 - speed);
             //Calculate _timer according to MoveSpeed / MoveSpeedMax / MovementsData.StopDecelerationDuration

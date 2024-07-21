@@ -39,7 +39,7 @@ namespace LOK.Common.Characters.Kenney
 
         protected override void OnStateEnter(AKenneyState previousState)
         {
-            Debug.Log(("TBACKAcelerate"));
+
             float speed = _speedWriter.MoveSpeed / _speedMaxReader.MoveSpeedMax;
             _timer = MovementsData.TurnBackAccelerationDuration * speed;
             //Calculate _timer according to MoveSpeed / MoveSpeedMax / MovementsData.TurnBackAccelerationDuration

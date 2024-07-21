@@ -28,6 +28,11 @@ namespace IIMEngine.Effects.Feel
 
         protected override void CustomPlayFeedback(Vector3 position, float feedbacksIntensity = 1)
         {
+            foreach (EffectsController ec in _effectsControllers)
+            {
+                ec.StopEffect(_effectID);
+            }
+            
             //Stop Effect with _effectId inside _effectsControllers
         }
     }

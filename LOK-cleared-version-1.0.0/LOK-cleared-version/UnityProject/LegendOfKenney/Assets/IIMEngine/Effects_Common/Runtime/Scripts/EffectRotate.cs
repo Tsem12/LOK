@@ -36,6 +36,9 @@ namespace IIMEngine.Effects.Common
         
         protected override void OnEffectReset()
         {
+            _timer = 0;
+            _objectToRotate.localEulerAngles -= _eulerAnglesDelta;
+            _eulerAnglesDelta = Vector3.zero;
             //Reset Timer
             //Remove rotation delta from objectToRotate localRotation (using eulerAngles)
             //Reset rotation delta Z
@@ -43,6 +46,17 @@ namespace IIMEngine.Effects.Common
 
         protected override IEnumerator OnEffectEndCoroutine()
         {
+            while (_timer < _rotationPeriod)
+            {
+                ObjectToRotate.localEulerAngles -= _eulerAnglesDelta;
+                _timer += Time.deltaTime;
+                float percentage = _timer / _rotationPeriod;
+                percentage = _rotationCurve.Evaluate(percentage);
+                _eulerAnglesDelta = new Vector3(0, 0 ,_rotationAngle * percentage);
+                ObjectToRotate.localEulerAngles += _eulerAnglesDelta;
+                yield return null;
+            }
+            
             //TODO: Do not interrupt rotation
             //Wait for rotation stop delay (while loop)
                 //Remove rotation delta from objectToRotate localRotation (using eulerAngles)
@@ -59,6 +73,9 @@ namespace IIMEngine.Effects.Common
         
         protected override void OnEffectEnd()
         {
+            _timer = 0;
+            _objectToRotate.localEulerAngles -= _eulerAnglesDelta;
+            _eulerAnglesDelta = Vector3.zero;
             //Reset Timer
             //Remove rotation delta from objectToRotate localRotation (using eulerAngles)
             //Reset rotation delta Z
@@ -66,6 +83,18 @@ namespace IIMEngine.Effects.Common
 
         protected override void OnEffectUpdate()
         {
+            _objectToRotate.localEulerAngles -= _eulerAnglesDelta;
+            _timer += Time.deltaTime;
+            if (_isLooping)
+            {
+                if(_timer > _rotationPeriod) {_timer = 0;}
+            }
+
+            float percentage = _timer / _rotationPeriod;
+            percentage = _rotationCurve.Evaluate(percentage);
+            _eulerAnglesDelta = new Vector3(0, 0, percentage * _rotationAngle);
+            _objectToRotate.localEulerAngles += _eulerAnglesDelta;
+            
             //Remove rotation delta from objectToRotate localRotation (using eulerAngles)
             //Increment timer with delta time (bonus : Applying factor to deltaTime using timeModifier)
             //If effect is looping, timer must loop between [0, rotationPeriod]

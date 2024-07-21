@@ -32,7 +32,6 @@ namespace LOK.Common.Characters.Kenney
         {
             _speedWriter.MoveSpeed = _speedMaxReader.MoveSpeedMax;
             _orientWriter.OrientDir = _movReader.MoveDir;
-            Debug.Log("Enter Walk");
             //Force MoveSpeed to MoveSpeedMax
             //Force OrientDir to MoveDir
         }
