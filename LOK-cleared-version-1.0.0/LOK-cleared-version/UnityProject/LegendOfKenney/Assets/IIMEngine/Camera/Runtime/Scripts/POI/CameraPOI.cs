@@ -30,11 +30,13 @@ namespace IIMEngine.Camera
         private void OnEnable()
         {
             //Register this object into static class CameraPOIs
+            CameraPOIs.RegisterPOI(this);
         }
 
         private void OnDisable()
         {
             //Unregister this object into static class CameraPOIs
+            CameraPOIs.UnregisterPOI(this);
         }
 
         private void OnDrawGizmos()

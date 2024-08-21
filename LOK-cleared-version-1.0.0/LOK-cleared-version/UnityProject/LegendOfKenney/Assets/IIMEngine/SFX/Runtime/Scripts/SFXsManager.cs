@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace IIMEngine.SFX
@@ -19,7 +20,7 @@ namespace IIMEngine.SFX
         private Dictionary<string, List<SFXInstance>> _poolInstancesDict = new Dictionary<string, List<SFXInstance>>();
         private Dictionary<string, List<SFXInstance>> _playingInstancesDict = new Dictionary<string, List<SFXInstance>>();
         private Dictionary<string, SFXData> _datasDict = new Dictionary<string, SFXData>();
-        
+            
         #pragma warning restore 0414
         #endregion
 
@@ -44,19 +45,61 @@ namespace IIMEngine.SFX
 
         private void _CleanupNonPlayingInstances()
         {
+            foreach (var instance in _playingInstancesDict)
+            {
+                for(int i = 0; i < instance.Value.Count; i++)
+                {
+                    if (!instance.Value[i].AudioSource.isPlaying)
+                    {
+                        if (instance.Value[i].DestroyWhenComplete)
+                        {
+                            Destroy(instance.Value[i].AudioSource);
+                        }
+                        else
+                        {
+                            instance.Value[i].AudioSource.Stop();
+                            _poolInstancesDict[instance.Key].Add(instance.Value[i]);
+                        }
+                        instance.Value.Remove(instance.Value[i]);
+                    }
+                }
+            }
+            
             //Loop over all playing instance
                 //If SFXInstance audiosource is playing
                     //Destroy Instance if DestroyWhenComplete is true
-                    //Reset Instance and move it to pool is DestroyWhenComplete is false
+                    //Reset Instance and move it to pool if DestroyWhenComplete is false
         }
 
         private void _InitDatasDict()
         {
+            foreach (var sfx in _bank.SFXDatasList)
+            {
+                _datasDict[sfx.Name] = sfx;
+            }
             //Loop over all SFXsData inside bank and fill _datasDict dictionary
         }
 
         private void _InitPoolDict()
         {
+            foreach (SFXData sfx in _bank.SFXDatasList)
+            {
+                List<SFXInstance> instances = new List<SFXInstance>();
+                for (int i = 0; i < sfx.SizeMax; i++)
+                {
+                    AudioSource audioSource = Instantiate(_audioSourceTemplate, _audioSourceTemplate.transform.position, Quaternion.identity, _audioSourceTemplate.transform.parent);
+                    SFXInstance instance = new SFXInstance();
+                    instance.SFXName = sfx.Name;
+                    audioSource.gameObject.name = sfx.Name;
+                    audioSource.loop = sfx.IsLooping;
+                    audioSource.clip = sfx.Clip;
+                    instance.AudioSource = audioSource;
+                    instance.Transform = audioSource.transform;
+                    instance.GameObject = audioSource.gameObject;
+                    instances.Add(instance);
+                }
+                _poolInstancesDict[sfx.Name] = instances;
+            }
             //Loop over all SFXsData inside bank
             //Create multiple SFXsInstance using SizeMax property inside SFXData
             //And store it into _poolInstancesDict
@@ -64,6 +107,10 @@ namespace IIMEngine.SFX
         
         private void _InitPlayingInstancesDict()
         {
+            foreach (SFXData sfx in _bank.SFXDatasList)
+            {
+                _playingInstancesDict[sfx.Name] = new List<SFXInstance>();
+            }
             //Loop over all SFXsData inside bank
             //Init PlayingInstances Dictionary using SizeMax property inside SFXData
         }
@@ -81,6 +128,45 @@ namespace IIMEngine.SFX
 
         private SFXInstance _PikUpInstanceFromPool(string name)
         {
+            if (!_poolInstancesDict.ContainsKey(name)) return null;
+
+            SFXInstance sfx = null;
+            bool areInstanceAvailable = _poolInstancesDict[name].Count > 0;
+
+            if (areInstanceAvailable)
+            {
+                sfx = _poolInstancesDict[name][0];
+                _poolInstancesDict[name].Remove(sfx);
+                _playingInstancesDict[name].Add(sfx);
+            }
+            else
+            {
+                switch (_datasDict[name].OverflowOperation)
+                {
+                    case SFXOverflowOperation.Cancel:
+                        return null;
+                    
+                    case SFXOverflowOperation.ReuseOldest:
+                        return _playingInstancesDict[name][0];
+                    
+                    case SFXOverflowOperation.CreateAndDestroy:
+                        SFXData sfxTemplate = _datasDict[name];
+                        AudioSource audioSource = Instantiate(_audioSourceTemplate, _audioSourceTemplate.transform.position, Quaternion.identity, _audioSourceTemplate.transform.parent);
+                        SFXInstance instance = new SFXInstance();
+                        instance.SFXName = sfxTemplate.Name;
+                        audioSource.gameObject.name = sfxTemplate.Name;
+                        audioSource.loop = sfxTemplate.IsLooping;
+                        audioSource.clip = sfxTemplate.Clip;
+                        instance.AudioSource = audioSource;
+                        instance.Transform = audioSource.transform;
+                        instance.GameObject = audioSource.gameObject;
+                        instance.DestroyWhenComplete = true;
+                        _playingInstancesDict[name].Add(instance);
+                        return instance;
+                }
+            }
+            
+            return sfx;
             //Try to find an SFXInstance inside Pool Dictionary
             
             //If an Instance is available
@@ -99,11 +185,18 @@ namespace IIMEngine.SFX
                 //Add Found sfx instance to PlayingSFX Dictionary
                 //return Instance
 
-            return null;
+            
         }
 
         private void _LoadAllAudiosData()
         {
+            foreach (var instance in _poolInstancesDict)
+            {
+                foreach (SFXInstance sfxInstance in instance.Value)
+                {
+                    sfxInstance.AudioSource.clip.LoadAudioData();
+                }
+            }
             //AudioClips are not load by default
             //We need to load it using LoadAudioData
             //See : https://docs.unity3d.com/ScriptReference/AudioClip.LoadAudioData.html

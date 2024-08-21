@@ -21,21 +21,25 @@ namespace IIMEngine.Camera
         public static void RegisterDetector(CameraPOIDetector detector)
         {
             //Add Detector into _activeDetectors List
+            _activeDetectors.Add(detector);
         }
 
         public static void UnregisterDetector(CameraPOIDetector detector)
         {
             //Remove Detector into _activeDetectors List
+            _activeDetectors.Remove(detector);
         }
         
         public static void RegisterPOI(CameraPOI cameraPOI)
         {
             //Add POIs into _activePOIs List
+            _activePOIs.Add(cameraPOI);
         }
 
         public static void UnregisterPOI(CameraPOI cameraPOI)
         {
             //Remove POIs into _activePOIs List
+            _activePOIs.Remove(cameraPOI);
         }
     }
 }

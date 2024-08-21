@@ -71,20 +71,51 @@ namespace IIMEngine.Camera
                 //Optional : Clamp Destination with Camera Bounds
                 //Lerp position with destination using CameraProfile.FollowLerpSpeed
             // --------------------------------------------------------
-
+            
             if (_currentProfile.FollowTargetGroups.Length > 0 && !IsTransitionActive)
             {
-                if (_currentProfile.UsePOIs)
+                Vector3 poiCentroid = Vector3.zero;
+                Vector3 followGroupCentroid = Vector3.zero;
+                foreach (var cf in CameraFollowables.FindByGroups(_currentProfile.FollowTargetGroups))
                 {
-                    //_currentProfile.Cen
+                    followGroupCentroid += cf.Position;
+                }
+                followGroupCentroid /= _currentProfile.FollowTargetGroups.Length;
+                _destination = followGroupCentroid;
+                
+                if (_currentProfile.UsePOIs && CameraPOIUtils.FindPOIsNearby(_cacheCameraPOIs) > 0)
+                {
+                    int poiCount = 0;
+                    foreach (var poi in _cacheCameraPOIs)
+                    {
+                        if (poi != null)
+                        {
+                            poiCentroid += poi.Position;
+                            poiCount++;
+                        }
+                    }
+                    poiCentroid /= poiCount;
+                    if (Vector3.Distance(_position , poiCentroid) > _POIDestinationDistanceThreshold)
+                    {
+                        _destination = Vector3.Lerp(followGroupCentroid, poiCentroid, Vector3.Distance(followGroupCentroid , poiCentroid) / _currentProfile.FollowPOIsDamping);
+                        _POIMovementsState = POIMovementsState.Compensate;
+                    }
+                    else
+                    {
+                        _destination = poiCentroid;
+                        _POIMovementsState = POIMovementsState.Snap;
+                    }
                 }
                 else
                 {
-                    //_currentProfile.FollowTargetGroups
+                    _destination = followGroupCentroid;
                 }
+                
+                _position = Vector3.Lerp(cameraTransform.position, _destination, Time.deltaTime * _currentProfile.FollowLerpSpeed);
             }
+
             
-            cameraTransform.position = new Vector3(_position.x, _position.y, cameraTransform.position.z);
+            cameraTransform.position = _position + Vector3.back * 10;
             cameraTransform.rotation = _rotation;
             camera.orthographicSize = _size;
         }

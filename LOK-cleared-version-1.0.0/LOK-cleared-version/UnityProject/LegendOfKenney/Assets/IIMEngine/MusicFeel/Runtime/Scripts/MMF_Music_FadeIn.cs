@@ -17,9 +17,11 @@ namespace IIMEngine.Music.Feel
         #endregion
         
         //TODO: Override FeedbackDuration Property (using _duration)
+        public override float FeedbackDuration => _duration;
 
         protected override void CustomPlayFeedback(Vector3 position, float feedbacksIntensity = 1)
         {
+            MusicsGlobals.VolumeFader.FadeIn(_duration);
             //Call FadeIn from MusicVolumeFader (using _duration)
         }
     }

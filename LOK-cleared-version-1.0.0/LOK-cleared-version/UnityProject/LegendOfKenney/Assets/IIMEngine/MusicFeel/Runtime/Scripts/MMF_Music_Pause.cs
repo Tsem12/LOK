@@ -9,6 +9,7 @@ namespace IIMEngine.Music.Feel
     {
         protected override void CustomPlayFeedback(Vector3 position, float feedbacksIntensity = 1)
         {
+            MusicsGlobals.PlaylistManager.PauseMusic();
             //Call PauseMusic from MusicsPlaylistManager
         }
     }

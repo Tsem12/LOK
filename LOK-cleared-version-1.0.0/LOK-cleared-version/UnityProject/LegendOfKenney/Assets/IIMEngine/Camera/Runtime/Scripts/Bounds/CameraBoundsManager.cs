@@ -37,12 +37,39 @@ namespace IIMEngine.Camera
         public Vector3 ClampPosition(Vector3 position, UnityEngine.Camera camera)
         {
             //Check if bounds are enabled
-
             //Get BottomLeft Point using camera.ScreenToWorldPoint (using pos (0,0))
             //Get TopRight Point using camera.ScreenToWorldPoint / camera.pixelWidth / camera.pixelHeight
             //Calculate screenSize with TopRight and BottomLeft points
             //Clamp position according to bounds and screenSize
+            if (!_boundsEnabled)
+                return position;
 
+            Vector3 botLeft = camera.ScreenToWorldPoint(Vector3.zero);
+            Vector3 topRight = camera.ScreenToWorldPoint(new Vector2(camera.pixelWidth, camera.pixelHeight));
+
+            float xCorrection = 0f;
+            float yCorrection = 0f;
+
+            if (botLeft.x < _boundsRect.xMin)
+            {
+                xCorrection = _boundsRect.xMin - botLeft.x;
+            }
+            else if (topRight.x > _boundsRect.xMax)
+            {
+                xCorrection = _boundsRect.xMax - topRight.x;
+            }
+
+            if (botLeft.y < _boundsRect.yMin)
+            {
+                yCorrection = _boundsRect.yMin - botLeft.y;
+            }
+            else if(topRight.y > _boundsRect.yMax)
+            {
+                yCorrection = _boundsRect.yMax - topRight.y;
+            }
+
+            position += new Vector3(xCorrection, yCorrection);
+            
             return position;
         }
     }
